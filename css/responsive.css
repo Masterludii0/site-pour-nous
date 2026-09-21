@@ -1,0 +1,141 @@
+/* ============================================================
+   RESPONSIVE.CSS — adaptation mobile / tablette
+   C'est ce fichier qui manquait : sans lui, le menu mobile
+   restait invisible et "Notre histoire" gardait sa grille à
+   2 colonnes fixes, écrasée sur petit écran.
+   ============================================================ */
+
+/* ============================================================
+   TABLETTE (≤ 960px) — on empile le story-reel
+   ============================================================ */
+@media (max-width: 960px) {
+  .story-reel {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .story-sticky {
+    position: sticky;
+    top: 6vh;
+    height: 40vh;
+  }
+
+  .story-panels {
+    gap: 3rem;
+    padding-block: 1.5rem 0;
+  }
+
+  /* Sur un écran où l'image ne reste plus "collée", on affiche
+     directement le texte sans attendre l'activation au scroll. */
+  .story-panel {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============================================================
+   MOBILE (≤ 720px)
+   ============================================================ */
+@media (max-width: 720px) {
+  :root {
+    --section-padding: clamp(3.25rem, 14vw, 5rem);
+  }
+
+  /* ---------- Menu mobile ---------- */
+  .nav__toggle {
+    display: flex;
+    position: relative;
+    z-index: 101;
+  }
+
+  .nav__links {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 90;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding: 6rem 1.75rem 2rem;
+    background: var(--ink);
+    transform: translateY(-100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 0.4s ease, opacity 0.4s ease, visibility 0.4s ease;
+  }
+
+  .nav__links.is-open {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .nav__links a {
+    width: 100%;
+    padding-block: 0.9rem;
+    border-bottom: 1px solid var(--line-on-dark);
+    color: var(--paper);
+  }
+
+  /* Le panneau déroulant est toujours sombre : le texte reste clair
+     même quand la barre de nav elle-même est passée en fond clair. */
+  .nav.is-scrolled .nav__links a {
+    color: var(--paper);
+  }
+
+  .nav__toggle[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(6.5px) rotate(45deg);
+  }
+  .nav__toggle[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+  }
+  .nav__toggle[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-6.5px) rotate(-45deg);
+  }
+  .nav.is-scrolled .nav__toggle[aria-expanded="true"] span {
+    background: var(--paper);
+  }
+
+  /* ---------- Hero ---------- */
+  .hero__title {
+    font-size: clamp(2.2rem, 11vw, 3rem);
+  }
+
+  /* ---------- Footer ---------- */
+  .footer__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  /* ---------- Photos de lettres ---------- */
+  .letter__images {
+    gap: 20px;
+  }
+
+  .letter__image-item {
+    width: 145px;
+    padding: 10px 10px 36px;
+  }
+}
+
+/* ============================================================
+   PETITS TÉLÉPHONES (≤ 420px)
+   ============================================================ */
+@media (max-width: 420px) {
+  .gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .letter__image-item {
+    width: 130px;
+  }
+}
+
+/* ============================================================
+   Respect de prefers-reduced-motion pour le défilement d'ancre
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

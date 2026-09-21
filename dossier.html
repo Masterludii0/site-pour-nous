@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dossier — Et maintenant ?</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9D%A4%EF%B8%8F%3C/text%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/nouvelles.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/music-player.css">
+  <link rel="stylesheet" href="css/dossier-upload.css">
+</head>
+<body>
+
+  <header class="simple-bar">
+    <div class="container simple-bar__inner">
+      <a href="nouvelles.html" class="simple-bar__back">&larr; Tous les dossiers</a>
+      <span class="simple-bar__brand" aria-hidden="true">&#10084;</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="dossier-header">
+      <div class="container">
+        <h1 class="dossier-header__title" data-dossier-titre>…</h1>
+      </div>
+    </section>
+
+    <section class="dossier-section">
+      <div class="container">
+        <p class="dossier-empty" data-dossier-vide hidden></p>
+        <div class="media-grid" data-dossier-grille></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p class="footer__text">Et maintenant — <span data-year>2026</span></p>
+    </div>
+  </footer>
+
+  <!-- Bouton d'ajout, toujours visible -->
+  <button type="button" class="uploader-fab" data-uploader-fab aria-label="Ajouter une photo ou vidéo">+</button>
+
+  <!-- Formulaire d'ajout -->
+  <div class="uploader-modal" data-uploader-modal hidden>
+    <div class="uploader-modal__card">
+      <button type="button" class="uploader-modal__close" data-uploader-close aria-label="Fermer">✕</button>
+      <h2 class="uploader-modal__title">Ajouter un souvenir</h2>
+      <form data-uploader-form novalidate>
+        <label class="uploader-modal__field">
+          <span>Photo ou vidéo</span>
+          <input type="file" accept="image/*,video/*" required data-uploader-file>
+        </label>
+        <label class="uploader-modal__field">
+          <span>Titre</span>
+          <input type="text" maxlength="80" required data-uploader-titre>
+        </label>
+        <label class="uploader-modal__field">
+          <span>Description (optionnelle)</span>
+          <textarea maxlength="400" rows="3" data-uploader-description></textarea>
+        </label>
+        <p class="uploader-modal__message" data-uploader-message aria-live="polite"></p>
+        <button type="submit" class="uploader-modal__submit" data-uploader-submit>Ajouter</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lightbox (images et vidéos, titre + description à l'ouverture) -->
+  <div class="lightbox" aria-hidden="true">
+    <button class="lightbox__close" type="button" aria-label="Fermer">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+    </button>
+    <figure class="lightbox__figure">
+      <img class="lightbox__img" src="" alt="" hidden>
+      <video class="lightbox__video" controls hidden></video>
+      <figcaption class="lightbox__caption">
+        <span class="lightbox__title" data-lightbox-title></span>
+        <span class="lightbox__description" data-lightbox-description></span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <script src="js/nouvelles-config.js"></script>
+  <script src="js/dossier-content.js"></script>
+  <script src="js/music-config.js"></script>
+  <script src="js/music-player.js"></script>
+  <script>
+    document.querySelector("[data-year]").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

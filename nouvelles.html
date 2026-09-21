@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Et maintenant ?</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9D%A4%EF%B8%8F%3C/text%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/nouvelles.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/music-player.css">
+</head>
+<body>
+
+  <header class="simple-bar">
+    <div class="container simple-bar__inner">
+      <a href="index.html" class="simple-bar__back">&larr; Retour</a>
+      <span class="simple-bar__brand" aria-hidden="true">&#10084;</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="nouvelles-intro">
+      <div class="container nouvelles-intro__inner">
+        <h1 class="nouvelles-intro__title" data-nouvelles-titre>Et maintenant ?</h1>
+        <p class="nouvelles-intro__text" data-nouvelles-texte></p>
+      </div>
+    </section>
+
+    <section class="dossiers-section">
+      <div class="container">
+        <div class="dossiers-grid" data-dossiers></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p class="footer__text">Mis à jour au fil du temps — <span data-year>2026</span></p>
+    </div>
+  </footer>
+
+  <script src="js/nouvelles-config.js"></script>
+  <script src="js/nouvelles-content.js"></script>
+  <script src="js/music-config.js"></script>
+  <script src="js/music-player.js"></script>
+  <script>
+    document.querySelector("[data-year]").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

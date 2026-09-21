@@ -1,0 +1,162 @@
+/* ============================================================
+   DOSSIER-UPLOAD.CSS — bouton + et formulaire d'ajout
+   Chargé uniquement sur dossier.html.
+   ============================================================ */
+
+.uploader-fab {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 240;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--wine);
+  color: var(--paper);
+  font-size: 1.9rem;
+  font-weight: 300;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 16px 32px -12px rgba(110, 30, 59, 0.55);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.uploader-fab[hidden] {
+  display: none;
+}
+
+.uploader-fab:hover {
+  transform: scale(1.06);
+  box-shadow: 0 20px 38px -12px rgba(110, 30, 59, 0.65);
+}
+
+.uploader-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 260;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(43, 22, 34, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.uploader-modal[hidden] {
+  display: none;
+}
+
+.uploader-modal__card {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--paper);
+  border-radius: 20px;
+  padding: 2rem 1.75rem;
+  box-shadow: 0 30px 60px -20px rgba(43, 22, 34, 0.5);
+}
+
+.uploader-modal__close {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
+.uploader-modal__close:hover {
+  color: var(--wine);
+}
+
+.uploader-modal__title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--wine-dark);
+  margin-bottom: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.uploader-modal__field {
+  display: block;
+  margin-bottom: 1.1rem;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.uploader-modal__field span {
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.uploader-modal__field input[type="text"],
+.uploader-modal__field input[type="file"],
+.uploader-modal__field textarea {
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--line-on-light);
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--blush-light);
+}
+
+.uploader-modal__field textarea {
+  resize: vertical;
+}
+
+.uploader-modal__field input:focus,
+.uploader-modal__field textarea:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
+.uploader-modal__message {
+  min-height: 1.2rem;
+  font-size: 0.85rem;
+  color: var(--wine);
+  margin-bottom: 0.75rem;
+}
+
+.uploader-modal__submit {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 999px;
+  background: var(--wine);
+  color: var(--paper);
+  font-size: 0.95rem;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.uploader-modal__submit:hover {
+  transform: translateY(-1px);
+}
+
+.uploader-modal__submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
+}
+
+@media (max-width: 480px) {
+  .uploader-fab {
+    right: 1rem;
+    bottom: 1rem;
+    width: 50px;
+    height: 50px;
+    font-size: 1.7rem;
+  }
+  .uploader-modal__card {
+    padding: 1.6rem 1.35rem;
+    max-height: 90vh;
+  }
+}
