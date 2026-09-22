@@ -82,9 +82,13 @@
   const videoEl = lightbox.querySelector(".lightbox__video");
   const lbTitleEl = lightbox.querySelector("[data-lightbox-title]");
   const lbDescEl = lightbox.querySelector("[data-lightbox-description]");
+  const deleteBtn = lightbox.querySelector("[data-lightbox-delete]");
   const closeBtn = lightbox.querySelector(".lightbox__close");
 
+  let mediaOuvert = null;
+
   function openLightbox(media) {
+    mediaOuvert = media;
     if (media.type === "video") {
       videoEl.src = media.url;
       videoEl.hidden = false;
@@ -100,6 +104,8 @@
     lbTitleEl.textContent = media.titre || "";
     lbDescEl.textContent = media.description || "";
     lbDescEl.hidden = !media.description;
+    deleteBtn.disabled = false;
+    deleteBtn.textContent = "Supprimer ce souvenir";
     lightbox.classList.add("is-open");
     document.body.style.overflow = "hidden";
   }
@@ -110,6 +116,7 @@
     videoEl.pause();
     videoEl.src = "";
     imgEl.src = "";
+    mediaOuvert = null;
   }
 
   document.addEventListener("click", (e) => {
@@ -125,6 +132,36 @@
   });
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && lightbox.classList.contains("is-open")) closeLightbox();
+  });
+
+  deleteBtn.addEventListener("click", async () => {
+    if (!mediaOuvert) return;
+    const confirmation = window.confirm("Supprimer ce souvenir ? C'est définitif.");
+    if (!confirmation) return;
+
+    deleteBtn.disabled = true;
+    deleteBtn.textContent = "Suppression…";
+
+    try {
+      const reponse = await fetch("/api/supprimer-media", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dossier: dossierMeta.id, url: mediaOuvert.url }),
+      });
+
+      if (!reponse.ok) {
+        const donnees = await reponse.json().catch(() => ({}));
+        throw new Error(donnees.erreur || `Erreur ${reponse.status}`);
+      }
+
+      closeLightbox();
+      await chargerMedias();
+    } catch (erreur) {
+      console.error(erreur);
+      window.alert(`La suppression a échoué : ${erreur.message}`);
+      deleteBtn.disabled = false;
+      deleteBtn.textContent = "Supprimer ce souvenir";
+    }
   });
 
   /* ---------- Ajout d'un souvenir (bouton + / formulaire) ---------- */
