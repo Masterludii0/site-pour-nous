@@ -829,6 +829,25 @@ section {
   display: none;
 }
 
+.lightbox__delete {
+  display: block;
+  margin: 1rem auto 0;
+  font-size: 0.78rem;
+  color: rgba(255, 251, 250, 0.4);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.25s ease;
+}
+
+.lightbox__delete:hover {
+  color: var(--rose-gold);
+}
+
+.lightbox__delete:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .lightbox__close {
   position: absolute;
   top: 1.5rem;
