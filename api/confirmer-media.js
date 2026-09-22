@@ -7,8 +7,43 @@
 // ============================================================
 
 import { put, head, BlobNotFoundError } from '@vercel/blob';
+import nodemailer from 'nodemailer';
 
 const DOSSIERS_AUTORISES = ['moi', 'morgane'];
+
+async function envoyerNotifications({ dossierNom, titre, lienDossier, exclure }) {
+  // Si l'email n'est pas configuré, on n'envoie rien — silencieusement,
+  // ça ne doit jamais faire échouer l'ajout du média lui-même.
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) return;
+
+  let abonnes = [];
+  try {
+    const manifestBlob = await head('manifests/abonnes.json');
+    const reponse = await fetch(manifestBlob.url);
+    abonnes = await reponse.json();
+  } catch (e) {
+    abonnes = [];
+  }
+
+  const exclusion = String(exclure || '').trim().toLowerCase();
+  const destinataires = abonnes.filter((email) => email !== exclusion);
+  if (!destinataires.length) return;
+
+  const transporteur = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD,
+    },
+  });
+
+  await transporteur.sendMail({
+    from: `"Et maintenant ?" <${process.env.GMAIL_USER}>`,
+    to: destinataires,
+    subject: `Nouveau souvenir dans "${dossierNom}"`,
+    text: `${titre}\n\nVa y jeter un œil : ${lienDossier}`,
+  });
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -23,7 +58,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { dossier, url, type, titre, description } = req.body || {};
+    const { dossier, dossierNom, url, type, titre, description, notifierEmail } = req.body || {};
 
     if (!DOSSIERS_AUTORISES.includes(dossier)) {
       return res.status(400).json({ erreur: 'Dossier inconnu' });
@@ -64,6 +99,19 @@ export default async function handler(req, res) {
       addRandomSuffix: false,
       allowOverwrite: true,
     });
+
+    try {
+      await envoyerNotifications({
+        dossierNom: dossierNom || dossier,
+        titre: nouveauMedia.titre,
+        lienDossier: `https://${req.headers.host}/dossier.html?personne=${dossier}`,
+        exclure: notifierEmail,
+      });
+    } catch (erreurEmail) {
+      // L'ajout du média a réussi, on ne le fait pas échouer pour un
+      // problème d'envoi d'email — juste consigné dans les logs.
+      console.error('Envoi des notifications échoué :', erreurEmail);
+    }
 
     return res.status(200).json({ succes: true, media: nouveauMedia });
   } catch (erreur) {
