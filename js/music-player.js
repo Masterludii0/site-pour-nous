@@ -1,21 +1,3 @@
-/* ============================================================
-   MUSIC-PLAYER.JS — popup + widget de musique, sur toutes les pages
-   ============================================================
-   Le site est composé de plusieurs pages HTML séparées (pas une
-   "single page app") : à chaque clic sur un lien, le navigateur
-   recharge entièrement la page. Impossible donc de faire jouer un
-   seul flux audio en continu sans coupure d'une page à l'autre —
-   aucun site "statique" ne le peut.
-
-   Ce script fait la meilleure chose possible dans ce cadre : il
-   retient dans sessionStorage (mémoire du navigateur qui dure le
-   temps de l'onglet ouvert, et s'efface quand elle ferme/revient
-   plus tard) le choix "oui/non", le volume et la position de
-   lecture. À chaque nouvelle page, il reprend automatiquement la
-   musique quasiment là où elle en était, sans redemander la
-   permission tant que c'est la même visite.
-   ============================================================ */
-
 (function () {
   "use strict";
 
@@ -58,11 +40,11 @@
   player.innerHTML = `
     <button type="button" class="music-player__toggle" data-music-toggle aria-label="Mettre en pause">
       <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true">
-        <rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor"/>
-        <rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor"/>
+        <rect x="7" y="6" width="3.2" height="12" rx="1.6" fill="currentColor"/>
+        <rect x="13.8" y="6" width="3.2" height="12" rx="1.6" fill="currentColor"/>
       </svg>
       <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true" hidden>
-        <path d="M7 5l12 7-12 7V5z" fill="currentColor"/>
+        <path d="M8 5.5v13l11-6.5-11-6.5z" fill="currentColor"/>
       </svg>
     </button>
     <div class="music-player__info">
