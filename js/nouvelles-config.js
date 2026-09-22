@@ -14,8 +14,7 @@
 const NOUVELLES_CONFIG = {
   intro: {
     titre: "Et maintenant ?",
-    texte: `Loin des messages qui s'effacent et des stories qui
-    disparaissent au bout de 24h, un endroit simple pour se dire
+    texte: `Loin des réseaux que l'ont peut supprimer, un endroit simple pour se dire
     "qu'est-ce qu'on devient". Chacun son dossier — appuie sur le
     petit bouton "+" pour y ajouter une photo ou une vidéo.`
   },
