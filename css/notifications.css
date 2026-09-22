@@ -1,0 +1,114 @@
+/* ============================================================
+   NOTIFICATIONS.CSS — bannière d'inscription, en bas à droite
+   ============================================================ */
+
+.notif-banniere {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 230;
+  width: min(300px, calc(100vw - 2.5rem));
+  background: var(--paper);
+  border-radius: 16px;
+  padding: 1.35rem 1.5rem 1.25rem;
+  box-shadow: 0 20px 40px -18px rgba(43, 22, 34, 0.45);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none;
+}
+
+.notif-banniere.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.notif-banniere__fermer {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  color: var(--muted);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.notif-banniere__fermer:hover {
+  color: var(--wine);
+}
+
+.notif-banniere__texte {
+  font-size: 0.86rem;
+  color: var(--ink);
+  line-height: 1.5;
+  margin-bottom: 0.95rem;
+  padding-right: 1rem;
+}
+
+.notif-banniere__form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.notif-banniere__form input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--line-on-light);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  background: var(--blush-light);
+  color: var(--ink);
+}
+
+.notif-banniere__form input:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
+.notif-banniere__ok {
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  background: var(--wine);
+  color: var(--paper);
+  font-size: 0.82rem;
+  white-space: nowrap;
+  transition: background 0.25s ease;
+}
+
+.notif-banniere__ok:hover {
+  background: var(--wine-dark);
+}
+
+.notif-banniere__ok:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.notif-banniere__non {
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.notif-banniere__non:hover {
+  color: var(--wine);
+}
+
+@media (max-width: 480px) {
+  .notif-banniere {
+    right: 0.75rem;
+    left: 0.75rem;
+    bottom: 0.75rem;
+    width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notif-banniere {
+    transition: none;
+  }
+}
