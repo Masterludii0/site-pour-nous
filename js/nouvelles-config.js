@@ -21,7 +21,7 @@ const NOUVELLES_CONFIG = {
   },
 
   dossiers: [
-    { id: "moi", nom: "Moi" },
+    { id: "moi", nom: "Ethanaël" },
     { id: "morgane", nom: "Morgane" }
   ]
 };
