@@ -12,6 +12,13 @@ import { handleUpload } from '@vercel/blob/client';
 const DOSSIERS_AUTORISES = ['moi', 'morgane'];
 
 export default async function handler(request, response) {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return response.status(500).json({
+      error:
+        "BLOB_READ_WRITE_TOKEN est absent sur ce déploiement. Vérifie que le Blob store est bien connecté à ce projet ET que la variable est activée pour l'environnement Production dans Vercel, puis redéploie.",
+    });
+  }
+
   const body = request.body;
 
   try {
