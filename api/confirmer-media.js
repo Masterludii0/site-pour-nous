@@ -6,13 +6,20 @@
 // lit ensuite (via /api/medias) — d'où la synchronisation.
 // ============================================================
 
-import { put, head } from '@vercel/blob';
+import { put, head, BlobNotFoundError } from '@vercel/blob';
 
 const DOSSIERS_AUTORISES = ['moi', 'morgane'];
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ erreur: 'Méthode non autorisée' });
+  }
+
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return res.status(500).json({
+      erreur:
+        "BLOB_READ_WRITE_TOKEN est absent sur ce déploiement. Vérifie la connexion du Blob store à ce projet et l'environnement Production dans Vercel.",
+    });
   }
 
   try {
@@ -33,7 +40,11 @@ export default async function handler(req, res) {
       const reponse = await fetch(manifestBlob.url);
       medias = await reponse.json();
     } catch (e) {
-      // Pas encore de manifeste pour ce dossier : première entrée.
+      if (!(e instanceof BlobNotFoundError)) {
+        // Une vraie erreur (pas juste "pas encore de manifeste") : on la
+        // remonte au lieu de la masquer silencieusement.
+        throw e;
+      }
       medias = [];
     }
 
@@ -57,6 +68,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ succes: true, media: nouveauMedia });
   } catch (erreur) {
     console.error(erreur);
-    return res.status(500).json({ erreur: "Impossible d'enregistrer ce média." });
+    return res.status(500).json({ erreur: erreur.message || "Impossible d'enregistrer ce média." });
   }
 }
