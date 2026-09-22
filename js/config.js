@@ -31,7 +31,7 @@ const SITE_CONFIG = {
     {
       date: "Le début",
       titre: "Nos débuts",
-      texte: "Bien que j'etais timide au debut et n'osait pas te regarder, je n'oublierais jamais notre rencontre et surtout nos debut aux soirées etudiantes et chez mamie Monique"
+      texte: "Bien que j'etais timide au debut et n'osait pas te regarder, je n'oublierais jamais notre rencontre et surtout nos debuts aux soirées etudiantes et ta chambre chez mamie Monique"
     },
     {
       date: "Après",
@@ -79,14 +79,14 @@ const SITE_CONFIG = {
   lettre: {
     corps: `Je voulais un endroit rien qu'à nous, loin des messages qui
     s'effacent et des conversations qu'on oublie. Alors j'ai construit
-    celui-ci, ligne par ligne, comme on écrit une lettre qu'on prend
+    celui-ci, ligne par ligne (3000+), comme on écrit une lettre qu'on prend
     le temps de bien écrire.
 
     Merci d'exister, tu m'a tellement appris. Merci de rendre tout, même
     les journées les plus banales, beaucoup plus lumineuses.
 
     Je t'aime.`,
-    signature: "— Ethanaël, pour toujours",
+    signature: "— Ethanaël, je t'aime ... pour toujours",
 
     // --- Photos des lettres manuscrites que tu as écrites ---
     // Mets tes fichiers dans assets/images/lettres/ et renseigne le nom
