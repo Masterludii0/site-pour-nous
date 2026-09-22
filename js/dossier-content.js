@@ -175,19 +175,29 @@
     submitBtn.disabled = true;
     messageEl.textContent = "Envoi en cours…";
 
+    const estVideo =
+      fichier.type.startsWith("video") || /\.(mov|mp4|m4v|webm|mkv|avi|3gp)$/i.test(fichier.name);
+    const type = estVideo ? "video" : "image";
+    const nomPropre = fichier.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const cheminBlob = `nouvelles/${dossierMeta.id}/${Date.now()}-${nomPropre}`;
+
+    let blob;
     try {
       // Chargé dynamiquement (fonctionne dans un <script> classique,
       // pas besoin de convertir toute la page en modules).
       const { upload } = await import("https://esm.sh/@vercel/blob/client");
-
-      const type = fichier.type.startsWith("video") ? "video" : "image";
-      const cheminBlob = `nouvelles/${dossierMeta.id}/${Date.now()}-${fichier.name}`;
-
-      const blob = await upload(cheminBlob, fichier, {
+      blob = await upload(cheminBlob, fichier, {
         access: "public",
         handleUploadUrl: "/api/blob-upload",
       });
+    } catch (erreurEnvoi) {
+      console.error("Échec de l'envoi vers Vercel Blob :", erreurEnvoi);
+      messageEl.textContent = `Échec de l'envoi : ${erreurEnvoi.message || "erreur inconnue"}`;
+      submitBtn.disabled = false;
+      return;
+    }
 
+    try {
       const reponse = await fetch("/api/confirmer-media", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -200,14 +210,17 @@
         }),
       });
 
-      if (!reponse.ok) throw new Error("La confirmation a échoué");
+      if (!reponse.ok) {
+        const donnees = await reponse.json().catch(() => ({}));
+        throw new Error(donnees.erreur || `Erreur ${reponse.status}`);
+      }
 
       messageEl.textContent = "Ajouté !";
       await chargerMedias();
       setTimeout(closeModal, 700);
-    } catch (erreur) {
-      console.error(erreur);
-      messageEl.textContent = "L'envoi a échoué. Réessaie dans un instant.";
+    } catch (erreurConfirmation) {
+      console.error("Fichier envoyé mais non enregistré :", erreurConfirmation);
+      messageEl.textContent = `Fichier envoyé mais pas enregistré : ${erreurConfirmation.message}`;
     } finally {
       submitBtn.disabled = false;
     }
