@@ -120,14 +120,16 @@
 
 .music-player__toggle {
   flex-shrink: 0;
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background: var(--gold);
+  background: linear-gradient(155deg, var(--gold) 0%, var(--rose-gold) 100%);
   color: var(--ink);
   display: grid;
   place-items: center;
-  transition: transform 0.25s ease, background 0.3s ease;
+  border: 1px solid rgba(255, 251, 250, 0.35);
+  box-shadow: 0 6px 14px -6px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.4s ease;
 }
 
 .music-player:not(.is-paused) .music-player__toggle {
@@ -135,20 +137,25 @@
 }
 
 .music-player__toggle:hover {
-  transform: scale(1.08);
+  transform: scale(1.1);
+  box-shadow: 0 8px 18px -6px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.45);
+}
+
+.music-player__toggle:active {
+  transform: scale(0.94);
 }
 
 .music-player__toggle svg {
-  width: 13px;
-  height: 13px;
+  width: 15px;
+  height: 15px;
 }
 
 .music-player__toggle .icon-play {
-  margin-left: 1px;
+  margin-left: 2px;
 }
 
 .music-player.is-paused .music-player__toggle {
-  background: var(--rose-gold);
+  background: linear-gradient(155deg, var(--rose-gold) 0%, var(--wine) 100%);
 }
 
 .music-player__info {
