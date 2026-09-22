@@ -1,3 +1,11 @@
+// ============================================================
+// api/supprimer-media.js
+// Retire un média du manifeste JSON du dossier, et supprime le
+// fichier correspondant sur Vercel Blob pour ne rien laisser
+// traîner. Comme pour l'ajout, tout le monde voit la suppression
+// dès le prochain chargement (même manifeste partagé).
+// ============================================================
+
 import { put, head, del, BlobNotFoundError } from '@vercel/blob';
 
 const DOSSIERS_AUTORISES = ['moi', 'morgane'];
@@ -48,6 +56,8 @@ export default async function handler(req, res) {
       allowOverwrite: true,
     });
 
+    // On supprime aussi le fichier lui-même. Si ça échoue, ce n'est pas
+    // bloquant : le média a déjà disparu du manifeste, donc du site.
     try {
       await del(url);
     } catch (e) {
