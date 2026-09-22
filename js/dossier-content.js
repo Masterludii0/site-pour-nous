@@ -192,7 +192,32 @@
       });
     } catch (erreurEnvoi) {
       console.error("Échec de l'envoi vers Vercel Blob :", erreurEnvoi);
-      messageEl.textContent = `Échec de l'envoi : ${erreurEnvoi.message || "erreur inconnue"}`;
+
+      // Le SDK @vercel/blob affiche toujours le même message générique
+      // ("Failed to retrieve the client token"), quelle que soit la vraie
+      // cause. On reproduit sa requête nous-mêmes pour lire la vraie
+      // réponse JSON (qui, elle, contient le vrai message).
+      let raison = erreurEnvoi.message || "erreur inconnue";
+      try {
+        const diagnostic = await fetch("/api/blob-upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "blob.generate-client-token",
+            payload: {
+              pathname: cheminBlob,
+              callbackUrl: `${window.location.origin}/api/blob-upload`,
+              multipart: false,
+            },
+          }),
+        });
+        const donnees = await diagnostic.json().catch(() => ({}));
+        if (donnees.error) raison = donnees.error;
+      } catch (e) {
+        // Le diagnostic lui-même a échoué : on garde le message d'origine.
+      }
+
+      messageEl.textContent = `Échec de l'envoi : ${raison}`;
       submitBtn.disabled = false;
       return;
     }
