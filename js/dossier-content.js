@@ -265,10 +265,12 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           dossier: dossierMeta.id,
+          dossierNom: dossierMeta.nom,
           url: blob.url,
           type,
           titre,
           description,
+          notifierEmail: window.getNotifEmail ? window.getNotifEmail() : null,
         }),
       });
 
