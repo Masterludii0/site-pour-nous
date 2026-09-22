@@ -16,7 +16,9 @@ const NOUVELLES_CONFIG = {
     titre: "Et maintenant ?",
     texte: `Loin des réseaux que l'ont peut supprimer, un endroit simple pour se dire
     "qu'est-ce qu'on devient". Chacun son dossier — appuie sur le
-    petit bouton "+" pour y ajouter une photo ou une vidéo.`
+    petit bouton "+" pour y ajouter une photo ou une vidéo.
+    Tu peux ajouter ton adresse mail en bas à droite pour être 
+    avertie quand je posterai des vidéos/photos. (dans les courriers indésirables)`
   },
 
   dossiers: [
