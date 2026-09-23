@@ -76,10 +76,14 @@ const SITE_CONFIG = {
   ],
 
   // --- Nos cadeaux : petite liste sous la galerie ---
+  // Pour chaque cadeau, tu peux soit garder juste un emoji, soit mettre
+  // une vraie photo/vidéo : mets le fichier dans assets/images/cadeaux/
+  // et renseigne son nom dans "media" (laisse vide pour garder l'emoji).
+  // "type" : "image" (par défaut) ou "video".
   cadeaux: [
-    { emoji: "💫", nom: "Le bracelet", note: "Pour ton anniversaire" },
-    { emoji: "🧳", nom: "Le weekend surprise", note: "Notre premier voyage ensemble" },
-    { emoji: "✉️", nom: "La lettre manuscrite", note: "Écrite un soir de pluie" }
+    { emoji: "💫", nom: "Le bracelet", note: "Pour ton anniversaire", media: "", type: "image" },
+    { emoji: "🧳", nom: "Le weekend surprise", note: "Notre premier voyage ensemble", media: "", type: "image" },
+    { emoji: "✉️", nom: "La lettre manuscrite", note: "Écrite un soir de pluie", media: "", type: "image" }
   ],
 
   // --- La lettre finale ---
