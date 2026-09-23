@@ -81,8 +81,10 @@ const SITE_CONFIG = {
   // et renseigne son nom dans "media" (laisse vide pour garder l'emoji).
   // "type" : "image" (par défaut) ou "video".
   cadeaux: [
+
 { emoji: "💳", nom: "La carte NFC de la Saint Valentin 2025", note: "J'ai pris la liberté de le faire sur une carte pour que tu aies la possibilité de le garder pour toujours", media: "assets/cadeaux/Carte_NFC.mp4", type: "video" },
-{ emoji: "📽️", nom: "La vidéo specialement pour toi de Alain Elloy", note: "Comme tu aimes la VF de Rick, je voulais te faire plaisir en te faisant ce message par Alain Eloy en personne ", media: "assets/cadeaux/Video_Alain_Eloy.mp4", type: "video" }
+{ emoji: "📽️", nom: "La vidéo specialement pour toi de Alain Eloy", note: "Comme tu aimes la VF de Rick, je voulais te faire plaisir en te faisant ce message par Alain Eloy en personne ", media: "assets/cadeaux/Video_Alain_Eloy.mp4", type: "video" }
+
 ],
 
   // --- La lettre finale ---
