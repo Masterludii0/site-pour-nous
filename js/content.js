@@ -82,8 +82,29 @@
     cfg.cadeaux.forEach((cadeau) => {
       const item = document.createElement("li");
       item.className = "cadeau";
+
+      let visuelHTML;
+      if (cadeau.media) {
+        const src = `assets/images/cadeaux/${cadeau.media}`;
+        if (cadeau.type === "video") {
+          visuelHTML = `
+            <button type="button" class="cadeau__media">
+              <video src="${src}" muted preload="metadata"></video>
+              <span class="cadeau__play" aria-hidden="true">▶</span>
+            </button>`;
+        } else {
+          visuelHTML = `
+            <button type="button" class="cadeau__media">
+              <img src="${src}" alt="${cadeau.nom}" loading="lazy"
+                   onerror="this.closest('.cadeau__media').outerHTML='<span class=&quot;cadeau__icon&quot; aria-hidden=&quot;true&quot;>${cadeau.emoji || "🎁"}</span>'">
+            </button>`;
+        }
+      } else {
+        visuelHTML = `<span class="cadeau__icon" aria-hidden="true">${cadeau.emoji || "🎁"}</span>`;
+      }
+
       item.innerHTML = `
-        <span class="cadeau__icon" aria-hidden="true">${cadeau.emoji || "🎁"}</span>
+        ${visuelHTML}
         <span class="cadeau__nom">${cadeau.nom}</span>
         ${cadeau.note ? `<span class="cadeau__note">${cadeau.note}</span>` : ""}
       `;
