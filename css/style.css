@@ -591,6 +591,58 @@ section {
   display: none;
 }
 
+/* ---------- Nos cadeaux (mini section sous la galerie) ---------- */
+.cadeaux {
+  margin-top: 3.5rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--line-on-light);
+}
+
+.cadeaux__heading {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.3rem;
+  color: var(--wine);
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.cadeaux__list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.cadeau {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.35rem;
+  width: 140px;
+  padding: 1.25rem 1rem;
+  background: var(--paper);
+  border-radius: 14px;
+  box-shadow: 0 10px 24px -16px rgba(74, 20, 40, 0.25);
+}
+
+.cadeau__icon {
+  font-size: 1.6rem;
+}
+
+.cadeau__nom {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--wine-dark);
+}
+
+.cadeau__note {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
 /* ============================================================
    NOTE DU JOUR
    ============================================================ */
