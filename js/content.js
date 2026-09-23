@@ -76,6 +76,21 @@
     });
   }
 
+  // --- Nos cadeaux ---
+  const cadeauxWrap = document.querySelector("[data-cadeaux]");
+  if (cadeauxWrap && Array.isArray(cfg.cadeaux)) {
+    cfg.cadeaux.forEach((cadeau) => {
+      const item = document.createElement("li");
+      item.className = "cadeau";
+      item.innerHTML = `
+        <span class="cadeau__icon" aria-hidden="true">${cadeau.emoji || "🎁"}</span>
+        <span class="cadeau__nom">${cadeau.nom}</span>
+        ${cadeau.note ? `<span class="cadeau__note">${cadeau.note}</span>` : ""}
+      `;
+      cadeauxWrap.appendChild(item);
+    });
+  }
+
   // --- Lettre : photos des lettres manuscrites ---
   const lettreImagesWrap = document.querySelector("[data-lettre-images]");
   if (lettreImagesWrap && Array.isArray(cfg.lettre.images)) {
