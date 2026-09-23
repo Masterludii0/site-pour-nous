@@ -631,6 +631,39 @@ section {
   font-size: 1.6rem;
 }
 
+.cadeau__media {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--blush);
+}
+
+.cadeau__media img,
+.cadeau__media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.cadeau__media:hover img,
+.cadeau__media:hover video {
+  transform: scale(1.08);
+}
+
+.cadeau__play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--paper);
+  font-size: 0.85rem;
+  background: rgba(43, 22, 34, 0.25);
+  pointer-events: none;
+}
+
 .cadeau__nom {
   font-family: var(--font-display);
   font-size: 0.95rem;
