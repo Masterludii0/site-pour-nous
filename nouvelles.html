@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pour toi</title>
-  <meta name="description" content="Un site rien qu'à nous.">
+  <title>Et maintenant ?</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9D%A4%EF%B8%8F%3C/text%3E%3C/svg%3E">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,162 +11,48 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/nouvelles.css">
   <link rel="stylesheet" href="css/responsive.css">
   <link rel="stylesheet" href="css/music-player.css">
   <link rel="stylesheet" href="css/notifications.css">
 </head>
 <body>
 
-  <!-- ============ NAVIGATION ============ -->
-  <header class="nav">
-    <div class="nav__inner container">
-      <a href="#hero" class="nav__brand">Toi <span aria-hidden="true">&amp;</span> <span data-partenaire>Mon amour</span></a>
-
-      <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Ouvrir le menu">
-        <span></span><span></span><span></span>
-      </button>
-
-      <nav class="nav__links" id="nav-links">
-        <a href="#histoire">Notre histoire</a>
-        <a href="#raisons">Pourquoi toi</a>
-        <a href="#moments">Nos moments</a>
-        <a href="#galerie">Galerie</a>
-        <a href="#note-du-jour">Note du jour</a>
-        <a href="#lettre">La lettre</a>
-        <a href="nouvelles.html" class="nav__links-external">Et maintenant ?</a>
-      </nav>
+  <header class="simple-bar">
+    <div class="container simple-bar__inner">
+      <a href="index.html" class="simple-bar__back">&larr; Retour</a>
+      <span class="simple-bar__brand" aria-hidden="true">&#10084;</span>
     </div>
   </header>
 
   <main>
-
-    <!-- ============ HERO ============ -->
-    <section id="hero" class="hero">
-      <canvas id="hero-canvas" aria-hidden="true"></canvas>
-      <div class="hero__content container">
-        <p class="hero__kicker">Un site rien qu'à nous</p>
-        <h1 class="hero__title">Pour <span data-partenaire>Mon amour</span></h1>
-        <p class="hero__subtitle">Une histoire, racontée à ma façon.</p>
-      </div>
-      <a href="#ouverture" class="hero__scroll-cue" aria-label="Défiler vers le bas">
-        <span></span>
-      </a>
-    </section>
-
-    <!-- ============ OUVERTURE ============ -->
-    <section id="ouverture" class="ouverture">
-      <div class="container ouverture__inner">
-        <p class="ouverture__text" data-ouverture data-reveal></p>
+    <section class="nouvelles-intro">
+      <div class="container nouvelles-intro__inner">
+        <h1 class="nouvelles-intro__title" data-nouvelles-titre>Et maintenant ?</h1>
+        <p class="nouvelles-intro__text" data-nouvelles-texte></p>
       </div>
     </section>
 
-    <!-- ============ NOTRE HISTOIRE (story-reel) ============ -->
-    <section id="histoire" class="story">
+    <section class="dossiers-section">
       <div class="container">
-        <h2 class="story__heading">Notre histoire</h2>
-      </div>
-
-      <div class="story-reel">
-        <div class="story-sticky">
-          <div class="story-visual-stack">
-            <!-- Le nombre de blocs ci-dessous doit correspondre au nombre
-                 d'étapes dans config.histoire. Remplace les images par les
-                 tiennes dans assets/images/ (voir README dans ce dossier). -->
-            <div class="story-visual is-active" data-visual-index="0">
-              <img src="assets/images/histoire-1.jpg" alt=""
-                   onerror="this.style.display='none'; this.closest('.story-visual').classList.add('story-visual--empty')">
-            </div>
-            <div class="story-visual" data-visual-index="1">
-              <img src="assets/images/histoire-2.jpg" alt=""
-                   onerror="this.style.display='none'; this.closest('.story-visual').classList.add('story-visual--empty')">
-            </div>
-            <div class="story-visual" data-visual-index="2">
-              <img src="assets/images/histoire-3.jpg" alt=""
-                   onerror="this.style.display='none'; this.closest('.story-visual').classList.add('story-visual--empty')">
-            </div>
-          </div>
-        </div>
-
-        <div class="story-panels" data-histoire-panels></div>
+        <div class="dossiers-grid" data-dossiers></div>
       </div>
     </section>
-
-    <!-- ============ POURQUOI TOI ============ -->
-    <section id="raisons" class="reasons">
-      <div class="container reasons__inner" data-reveal>
-        <h2 class="reasons__heading">Pourquoi toi</h2>
-        <ul class="reasons__list" data-raisons></ul>
-      </div>
-    </section>
-
-    <!-- ============ NOS MOMENTS (timeline) ============ -->
-    <section id="moments" class="timeline-section">
-      <div class="container">
-        <h2 class="timeline-section__heading" data-reveal>Nos moments</h2>
-        <ol class="timeline" data-timeline></ol>
-      </div>
-    </section>
-
-    <!-- ============ GALERIE ============ -->
-    <section id="galerie" class="gallery-section">
-      <div class="container">
-        <h2 class="gallery-section__heading" data-reveal>Galerie</h2>
-        <div class="gallery" data-galerie></div>
-
-        <div class="cadeaux">
-          <h3 class="cadeaux__heading">Nos cadeaux</h3>
-          <ul class="cadeaux__list" data-cadeaux></ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ NOTE DU JOUR ============ -->
-    <section id="note-du-jour" class="note-section">
-      <div class="container note__inner" data-reveal>
-        <span class="note__date" data-note-date></span>
-        <h2 class="note__title" data-note-titre>Note du jour</h2>
-        <p class="note__text" data-note-texte></p>
-      </div>
-    </section>
-
-    <!-- ============ LA LETTRE ============ -->
-    <section id="lettre" class="letter-section">
-      <div class="container letter" data-reveal>
-        <div class="letter__body" data-lettre-corps></div>
-        <div class="letter__images" data-lettre-images></div>
-        <p class="letter__signature" data-lettre-signature></p>
-      </div>
-    </section>
-
   </main>
 
-  <!-- ============ FOOTER ============ -->
   <footer class="footer">
     <div class="container footer__inner">
-      <p class="footer__text">Fait à la main pour <span data-partenaire>Mon amour</span> — <span data-year>2026</span></p>
+      <p class="footer__text">Mis à jour au fil du temps — <span data-year>2026</span></p>
     </div>
   </footer>
 
-  <!-- ============ LIGHTBOX (galerie) ============ -->
-  <div class="lightbox" aria-hidden="true">
-    <button class="lightbox__close" type="button" aria-label="Fermer">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-    </button>
-    <figure class="lightbox__figure">
-      <img class="lightbox__img" src="" alt="">
-      <figcaption class="lightbox__caption"></figcaption>
-    </figure>
-  </div>
-
-  <!-- ============ SCRIPTS (ordre important) ============ -->
-  <script src="js/config.js"></script>
-  <script src="js/content.js"></script>
-  <script src="js/particles.js"></script>
-  <script src="js/scrollReveal.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/nouvelles-config.js"></script>
+  <script src="js/nouvelles-content.js"></script>
   <script src="js/music-config.js"></script>
   <script src="js/music-player.js"></script>
   <script src="js/notifications.js"></script>
+  <script>
+    document.querySelector("[data-year]").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
