@@ -85,7 +85,7 @@
 
       let visuelHTML;
       if (cadeau.media) {
-        const src = `assets/images/cadeaux/${cadeau.media}`;
+        const src = `assets/cadeaux/${cadeau.media}`;
         if (cadeau.type === "video") {
           visuelHTML = `
             <button type="button" class="cadeau__media">
