@@ -598,7 +598,8 @@ section {
   align-items: center;
   text-align: center;
   gap: 0.35rem;
-  width: 280px; 
+  width: 280px !important;
+  min-width: 280px !important;
   padding: 1.25rem 1rem;
   background: var(--paper);
   border-radius: 14px;
