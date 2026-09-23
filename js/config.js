@@ -17,7 +17,7 @@ const SITE_CONFIG = {
   // que tu lui écris. La date du dessus se met à jour toute seule.
   noteDuJour: {
     titre: "Note du jour",
-    texte: "Aujourd'hui, j'ai pensé à toi en buvant mon café. Rien de plus, juste ça."
+    texte: "J'espère que ce 'projet' te feras plaisir car j'y ai mis tout mon temps et mon amour. j'ai la chance d'avoir eu quelqu'un a qui offrir ce genre de choses/petites attentions. Merci"
   },
 
   // --- Texte d'ouverture (juste sous le hero) ---
