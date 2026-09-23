@@ -633,11 +633,12 @@ section {
 
 .cadeau__media {
   position: relative;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
+  width: 100%; 
+  aspect-ratio: 16 / 9; 
+  border-radius: 8px; 
   overflow: hidden;
   background: var(--blush);
+  margin-bottom: 0.5rem; 
 }
 
 .cadeau__media img,
