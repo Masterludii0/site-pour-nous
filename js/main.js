@@ -71,23 +71,41 @@
   // ---------- Lightbox : galerie ET photos de lettres ----------
   // Délégation d'événements : fonctionne même pour les éléments injectés
   // dynamiquement par content.js, sans avoir besoin de re-binder quoi que ce soit.
-  const LIGHTBOX_TRIGGER_SELECTOR = ".gallery__item, .letter__image-item";
+  const LIGHTBOX_TRIGGER_SELECTOR = ".gallery__item, .letter__image-item, .cadeau__media";
 
   function initLightbox() {
     const lightbox = document.querySelector(".lightbox");
     if (!lightbox) return;
 
     const imgEl = lightbox.querySelector(".lightbox__img");
+    const videoEl = lightbox.querySelector(".lightbox__video");
     const captionEl = lightbox.querySelector(".lightbox__caption");
     const closeBtn = lightbox.querySelector(".lightbox__close");
     let lastFocused = null;
 
     const open = (item) => {
+      const video = item.querySelector("video");
       const img = item.querySelector("img");
-      if (!img || img.style.display === "none") return;
-      imgEl.src = img.src;
-      imgEl.alt = img.alt || "";
-      captionEl.textContent = img.alt || "";
+
+      if (video) {
+        videoEl.src = video.src;
+        videoEl.hidden = false;
+        imgEl.hidden = true;
+        imgEl.src = "";
+        captionEl.textContent = video.getAttribute("aria-label") || "";
+      } else if (img) {
+        if (img.style.display === "none") return;
+        imgEl.src = img.src;
+        imgEl.alt = img.alt || "";
+        imgEl.hidden = false;
+        videoEl.hidden = true;
+        videoEl.pause();
+        videoEl.src = "";
+        captionEl.textContent = img.alt || "";
+      } else {
+        return;
+      }
+
       lastFocused = document.activeElement;
       lightbox.classList.add("is-open");
       document.body.style.overflow = "hidden";
@@ -98,6 +116,8 @@
       lightbox.classList.remove("is-open");
       document.body.style.overflow = "";
       imgEl.src = "";
+      videoEl.pause();
+      videoEl.src = "";
       if (lastFocused) lastFocused.focus();
     };
 
