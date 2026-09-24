@@ -42,10 +42,12 @@ export default async function handler(request, response) {
           ],
           addRandomSuffix: true,
           maximumSizeInBytes: 5 * 1024 * 1024 * 1024, // 5 Go
-          // Par défaut le jeton expire après 30s, bien trop court pour
-          // l'envoi d'une vidéo de plusieurs centaines de Mo / quelques Go
-          // sur une connexion normale. On le rend valable 4h.
-          validUntil: Math.floor(Date.now() / 1000) + 4 * 60 * 60,
+          // Par défaut le jeton est valable 1h, ce qui suffit dans la
+          // plupart des cas mais peut être un peu juste pour une très
+          // grosse vidéo sur une connexion lente. On le porte à 4h.
+          // IMPORTANT : validUntil est un timestamp en MILLISECONDES
+          // (Date.now() renvoie déjà des ms, ne pas diviser par 1000).
+          validUntil: Date.now() + 4 * 60 * 60 * 1000,
         };
       },
       onUploadCompleted: async () => {
