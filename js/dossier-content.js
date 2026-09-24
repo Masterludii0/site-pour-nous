@@ -226,6 +226,13 @@
       blob = await upload(cheminBlob, fichier, {
         access: "public",
         handleUploadUrl: "/api/blob-upload",
+        // Indispensable pour les gros fichiers (vidéos) : découpe l'envoi
+        // en plusieurs parties, les envoie avec des tentatives de reprise
+        // en cas de coupure, au lieu d'une seule requête géante fragile.
+        multipart: true,
+        onUploadProgress: ({ percentage }) => {
+          messageEl.textContent = `Envoi en cours… ${percentage}%`;
+        },
       });
     } catch (erreurEnvoi) {
       console.error("Échec de l'envoi vers Vercel Blob :", erreurEnvoi);
