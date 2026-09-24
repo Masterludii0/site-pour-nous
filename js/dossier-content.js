@@ -223,6 +223,7 @@
       // Chargé dynamiquement (fonctionne dans un <script> classique,
       // pas besoin de convertir toute la page en modules).
       const { upload } = await import("https://esm.sh/@vercel/blob/client");
+      messageEl.textContent = "Envoi en cours… ça peut prendre plusieurs minutes pour une vidéo, merci de patienter sans fermer la page.";
       blob = await upload(cheminBlob, fichier, {
         access: "public",
         handleUploadUrl: "/api/blob-upload",
@@ -230,9 +231,13 @@
         // en plusieurs parties, les envoie avec des tentatives de reprise
         // en cas de coupure, au lieu d'une seule requête géante fragile.
         multipart: true,
-        onUploadProgress: ({ percentage }) => {
-          messageEl.textContent = `Envoi en cours… ${percentage}%`;
-        },
+        // Pas de onUploadProgress : sur Safari, ça force @vercel/blob à
+        // envoyer le corps de la requête en ReadableStream, ce que Safari
+        // affirme supporter (faux positif d'un test de détection connu
+        // pour être cassé sur Safari) puis refuse réellement au moment
+        // de l'envoi, avec l'erreur "ReadableStream uploading is not
+        // supported". Sans ce callback, le SDK envoie un Blob classique,
+        // qui fonctionne partout, y compris sur Safari/iPhone.
       });
     } catch (erreurEnvoi) {
       console.error("Échec de l'envoi vers Vercel Blob :", erreurEnvoi);
