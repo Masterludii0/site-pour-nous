@@ -41,7 +41,11 @@ export default async function handler(request, response) {
             'video/webm',
           ],
           addRandomSuffix: true,
-          maximumSizeInBytes: 200 * 1024 * 1024, // 200 Mo
+          maximumSizeInBytes: 5 * 1024 * 1024 * 1024, // 5 Go
+          // Par défaut le jeton expire après 30s, bien trop court pour
+          // l'envoi d'une vidéo de plusieurs centaines de Mo / quelques Go
+          // sur une connexion normale. On le rend valable 4h.
+          validUntil: Math.floor(Date.now() / 1000) + 4 * 60 * 60,
         };
       },
       onUploadCompleted: async () => {
