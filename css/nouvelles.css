@@ -158,8 +158,9 @@
 
 .media-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 190px));
+  justify-content: center;
+  gap: 1.1rem;
   max-width: var(--container-width);
   margin-inline: auto;
 }
