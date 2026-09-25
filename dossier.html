@@ -88,6 +88,23 @@
       <figcaption class="lightbox__caption">
         <span class="lightbox__title" data-lightbox-title></span>
         <span class="lightbox__description" data-lightbox-description></span>
+
+        <div class="lightbox__interactions">
+          <button type="button" class="lightbox__like" data-lightbox-like>
+            <span class="lightbox__like-icon" aria-hidden="true">♡</span>
+            <span data-lightbox-like-count>0</span>
+          </button>
+        </div>
+
+        <div class="lightbox__comments">
+          <ul class="lightbox__comments-list" data-lightbox-comments></ul>
+          <form class="lightbox__comment-form" data-comment-form>
+            <input type="text" placeholder="Ton prénom" maxlength="40" required data-comment-auteur autocomplete="name">
+            <textarea placeholder="Un petit mot..." maxlength="300" rows="2" required data-comment-texte></textarea>
+            <button type="submit">Envoyer</button>
+          </form>
+        </div>
+
         <button type="button" class="lightbox__delete" data-lightbox-delete>Supprimer ce souvenir</button>
       </figcaption>
     </figure>
