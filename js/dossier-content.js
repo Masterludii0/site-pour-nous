@@ -84,8 +84,55 @@
   const lbDescEl = lightbox.querySelector("[data-lightbox-description]");
   const deleteBtn = lightbox.querySelector("[data-lightbox-delete]");
   const closeBtn = lightbox.querySelector(".lightbox__close");
+  const likeBtn = lightbox.querySelector("[data-lightbox-like]");
+  const likeIconEl = likeBtn.querySelector(".lightbox__like-icon");
+  const likeCountEl = lightbox.querySelector("[data-lightbox-like-count]");
+  const commentsListEl = lightbox.querySelector("[data-lightbox-comments]");
+  const commentForm = lightbox.querySelector("[data-comment-form]");
+  const commentAuteurInput = lightbox.querySelector("[data-comment-auteur]");
+  const commentTexteInput = lightbox.querySelector("[data-comment-texte]");
 
   let mediaOuvert = null;
+
+  /* ---------- Likes (mémorisés sur l'appareil pour éviter de se liker en boucle) ---------- */
+  const LIKES_STORAGE_KEY = "mediasAimes";
+
+  function lireMediasAimes() {
+    try {
+      const brut = localStorage.getItem(LIKES_STORAGE_KEY);
+      return brut ? JSON.parse(brut) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function marquerAime(url, aime) {
+    try {
+      const liste = lireMediasAimes();
+      const index = liste.indexOf(url);
+      if (aime && index === -1) liste.push(url);
+      if (!aime && index !== -1) liste.splice(index, 1);
+      localStorage.setItem(LIKES_STORAGE_KEY, JSON.stringify(liste));
+    } catch (e) {}
+  }
+
+  function renderLike(media) {
+    const aime = lireMediasAimes().includes(media.url);
+    likeBtn.classList.toggle("is-liked", aime);
+    likeIconEl.textContent = aime ? "♥" : "♡";
+    likeCountEl.textContent = typeof media.likes === "number" ? media.likes : 0;
+  }
+
+  function renderComments(media) {
+    const commentaires = media.commentaires || [];
+    if (!commentaires.length) {
+      commentsListEl.innerHTML = `<li class="comment comment--vide">Aucun commentaire pour l'instant.</li>`;
+      return;
+    }
+    commentsListEl.innerHTML = commentaires
+      .map((c) => `<li class="comment"><span class="comment__auteur">${c.auteur}</span>${c.texte}</li>`)
+      .join("");
+  }
 
   function openLightbox(media) {
     mediaOuvert = media;
@@ -106,6 +153,9 @@
     lbDescEl.hidden = !media.description;
     deleteBtn.disabled = false;
     deleteBtn.textContent = "Supprimer ce souvenir";
+    renderLike(media);
+    renderComments(media);
+    commentForm.reset();
     lightbox.classList.add("is-open");
     document.body.style.overflow = "hidden";
   }
@@ -132,6 +182,63 @@
   });
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && lightbox.classList.contains("is-open")) closeLightbox();
+  });
+
+  likeBtn.addEventListener("click", async () => {
+    if (!mediaOuvert) return;
+    const aimeActuellement = lireMediasAimes().includes(mediaOuvert.url);
+    const nouvelEtat = !aimeActuellement;
+
+    // Mise à jour immédiate à l'écran, sans attendre la réponse serveur.
+    mediaOuvert.likes = Math.max(0, (mediaOuvert.likes || 0) + (nouvelEtat ? 1 : -1));
+    marquerAime(mediaOuvert.url, nouvelEtat);
+    renderLike(mediaOuvert);
+
+    try {
+      await fetch("/api/aimer-media", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          dossier: dossierMeta.id,
+          url: mediaOuvert.url,
+          action: nouvelEtat ? "aimer" : "retirer",
+        }),
+      });
+    } catch (erreur) {
+      console.error("Like non enregistré :", erreur);
+    }
+  });
+
+  commentForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!mediaOuvert) return;
+
+    const auteur = commentAuteurInput.value.trim();
+    const texte = commentTexteInput.value.trim();
+    if (!auteur || !texte) return;
+
+    const boutonEnvoyer = commentForm.querySelector("button");
+    boutonEnvoyer.disabled = true;
+
+    try {
+      const reponse = await fetch("/api/commenter-media", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dossier: dossierMeta.id, url: mediaOuvert.url, auteur, texte }),
+      });
+      const donnees = await reponse.json();
+      if (!reponse.ok) throw new Error(donnees.erreur || "Erreur");
+
+      if (!Array.isArray(mediaOuvert.commentaires)) mediaOuvert.commentaires = [];
+      mediaOuvert.commentaires.push(donnees.commentaire);
+      renderComments(mediaOuvert);
+      commentForm.reset();
+    } catch (erreur) {
+      console.error(erreur);
+      window.alert("Le commentaire n'a pas pu être envoyé. Réessaie dans un instant.");
+    } finally {
+      boutonEnvoyer.disabled = false;
+    }
   });
 
   deleteBtn.addEventListener("click", async () => {
