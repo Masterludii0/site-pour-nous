@@ -1,15 +1,22 @@
 // ============================================================
 // api/confirmer-media.js
 // Appelée par le client juste après qu'un fichier a été envoyé
-// à Vercel Blob : ajoute son titre/description/url au manifeste
-// JSON du dossier concerné. C'est ce manifeste que tout le monde
-// lit ensuite (via /api/medias) — d'où la synchronisation.
+// à Cloudflare R2 : ajoute son titre/description/url au manifeste
+// JSON du dossier concerné (stocké, lui, sur Vercel Blob : c'est un
+// tout petit fichier). C'est ce manifeste que tout le monde lit
+// ensuite (via /api/medias) — d'où la synchronisation.
 // ============================================================
 
 import { put, head, BlobNotFoundError } from '@vercel/blob';
 import nodemailer from 'nodemailer';
 
 const DOSSIERS_AUTORISES = ['moi', 'morgane'];
+
+function urlPublique() {
+  let base = String(process.env.R2_PUBLIC_URL || '').trim().replace(/\/+$/, '');
+  if (base && !/^https?:\/\//i.test(base)) base = `https://${base}`;
+  return base;
+}
 
 async function envoyerNotifications({ dossierNom, titre, lienDossier, exclure }) {
   // Si l'email n'est pas configuré, on n'envoie rien — silencieusement,
@@ -67,6 +74,15 @@ export default async function handler(req, res) {
       return res.status(400).json({ erreur: 'Informations manquantes' });
     }
 
+    // On n'enregistre que des fichiers qui sont bien dans NOTRE bucket R2 :
+    // sinon n'importe qui pourrait faire afficher une adresse quelconque
+    // sur le site.
+    const base = urlPublique();
+    const urlTexte = String(url);
+    if (!base || !urlTexte.startsWith(`${base}/nouvelles/`) || /[\s"'<>]/.test(urlTexte)) {
+      return res.status(400).json({ erreur: 'Adresse de média non reconnue.' });
+    }
+
     const manifestPath = `manifests/${dossier}.json`;
 
     let medias = [];
@@ -84,7 +100,7 @@ export default async function handler(req, res) {
     }
 
     const nouveauMedia = {
-      url: String(url),
+      url: urlTexte,
       type: type === 'video' ? 'video' : 'image',
       titre: String(titre).slice(0, 100),
       description: String(description || '').slice(0, 500),
