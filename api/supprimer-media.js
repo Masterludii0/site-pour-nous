@@ -1,14 +1,36 @@
 // ============================================================
 // api/supprimer-media.js
 // Retire un média du manifeste JSON du dossier, et supprime le
-// fichier correspondant sur Vercel Blob pour ne rien laisser
-// traîner. Comme pour l'ajout, tout le monde voit la suppression
-// dès le prochain chargement (même manifeste partagé).
+// fichier correspondant pour ne rien laisser traîner : sur
+// Cloudflare R2 pour les médias récents, sur Vercel Blob pour ceux
+// envoyés avant la migration. Comme pour l'ajout, tout le monde voit
+// la suppression dès le prochain chargement (même manifeste partagé).
 // ============================================================
 
 import { put, head, del, BlobNotFoundError } from '@vercel/blob';
+import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
 
 const DOSSIERS_AUTORISES = ['moi', 'morgane'];
+
+function urlPublique() {
+  let base = String(process.env.R2_PUBLIC_URL || '').trim().replace(/\/+$/, '');
+  if (base && !/^https?:\/\//i.test(base)) base = `https://${base}`;
+  return base;
+}
+
+async function supprimerDeR2(cle) {
+  const client = new S3Client({
+    region: 'auto',
+    endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId: process.env.R2_ACCESS_KEY_ID,
+      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+    },
+    requestChecksumCalculation: 'WHEN_REQUIRED',
+    responseChecksumValidation: 'WHEN_REQUIRED',
+  });
+  await client.send(new DeleteObjectCommand({ Bucket: process.env.R2_BUCKET, Key: cle }));
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -59,7 +81,13 @@ export default async function handler(req, res) {
     // On supprime aussi le fichier lui-même. Si ça échoue, ce n'est pas
     // bloquant : le média a déjà disparu du manifeste, donc du site.
     try {
-      await del(url);
+      const base = urlPublique();
+      if (base && String(url).startsWith(`${base}/nouvelles/`)) {
+        await supprimerDeR2(String(url).slice(base.length + 1));
+      } else {
+        // Ancien média, envoyé sur Vercel Blob avant la migration.
+        await del(url);
+      }
     } catch (e) {
       console.error("Le fichier n'a pas pu être supprimé du stockage :", e);
     }
