@@ -3,13 +3,75 @@
    - Charge les médias du dossier via /api/medias (synchronisé)
    - Grille : juste le média, sans titre/description visibles
    - Clic sur un média -> lightbox avec titre + description
-   - Bouton "+" -> formulaire -> upload direct vers Vercel Blob
-     -> confirmation via /api/confirmer-media -> tout le monde
-     voit le nouvel ajout au prochain chargement de la page.
+   - Bouton "+" -> formulaire -> upload direct vers Cloudflare R2
+     (10 Go gratuits) via une URL signée -> confirmation via
+     /api/confirmer-media -> tout le monde voit le nouvel ajout au
+     prochain chargement de la page.
    ============================================================ */
 
 (function () {
   "use strict";
+
+  // Limites d'envoi (le serveur les vérifie aussi) ---------------
+  const MAX_FICHIER_OCTETS = 500 * 1024 * 1024; // 500 Mo
+
+  const TYPES_PAR_EXTENSION = {
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    webp: "image/webp",
+    gif: "image/gif",
+    mp4: "video/mp4",
+    m4v: "video/mp4",
+    mov: "video/quicktime",
+    webm: "video/webm",
+  };
+
+  // Certains navigateurs laissent le type du fichier vide (typique pour
+  // les .mov) : on le déduit alors de l'extension.
+  function devinerContentType(fichier) {
+    if (fichier.type) return fichier.type;
+    const extension = (fichier.name.split(".").pop() || "").toLowerCase();
+    return TYPES_PAR_EXTENSION[extension] || "";
+  }
+
+  // Les commentaires viennent d'autres visiteurs : on neutralise tout
+  // HTML avant de les afficher.
+  function echapperHtml(valeur) {
+    return String(valeur ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  // Envoi du fichier avec suivi de progression. XMLHttpRequest est utilisé
+  // (plutôt que fetch) parce que fetch ne sait pas indiquer l'avancement
+  // d'un envoi ; ça fonctionne aussi sur Safari/iPhone.
+  function envoyerVersR2(url, fichier, contentType, surProgression) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("PUT", url);
+      xhr.setRequestHeader("Content-Type", contentType);
+      xhr.upload.onprogress = (evenement) => {
+        if (evenement.lengthComputable) {
+          surProgression(Math.round((evenement.loaded / evenement.total) * 100));
+        }
+      };
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) resolve();
+        else reject(new Error(`Le stockage a refusé le fichier (code ${xhr.status}).`));
+      };
+      xhr.onerror = () =>
+        reject(
+          new Error(
+            "Connexion interrompue pendant l'envoi. Si ça se reproduit, vérifie la règle CORS du bucket Cloudflare R2."
+          )
+        );
+      xhr.send(fichier);
+    });
+  }
 
   const params = new URLSearchParams(window.location.search);
   const personneId = params.get("personne");
@@ -37,11 +99,12 @@
 
   /* ---------- Chargement + rendu de la grille ---------- */
   function mediaCardHTML(media, index) {
+    const src = echapperHtml(media.url);
     const inner =
       media.type === "video"
-        ? `<video src="${media.url}" muted preload="metadata" class="media-card__media"></video>
+        ? `<video src="${src}" muted preload="metadata" class="media-card__media"></video>
            <span class="media-card__play" aria-hidden="true">▶</span>`
-        : `<img src="${media.url}" alt="" loading="lazy" class="media-card__media">`;
+        : `<img src="${src}" alt="" loading="lazy" class="media-card__media">`;
 
     return `
       <figure class="media-card">
@@ -130,7 +193,10 @@
       return;
     }
     commentsListEl.innerHTML = commentaires
-      .map((c) => `<li class="comment"><span class="comment__auteur">${c.auteur}</span>${c.texte}</li>`)
+      .map(
+        (c) =>
+          `<li class="comment"><span class="comment__auteur">${echapperHtml(c.auteur)}</span>${echapperHtml(c.texte)}</li>`
+      )
       .join("");
   }
 
@@ -316,64 +382,52 @@
       return;
     }
 
+    const contentType = devinerContentType(fichier);
+    const type = contentType.startsWith("video") ? "video" : "image";
+
+    // Vérification immédiate côté navigateur, pour répondre sans attendre.
+    if (fichier.size > MAX_FICHIER_OCTETS) {
+      const mo = Math.round(fichier.size / (1024 * 1024));
+      messageEl.textContent = `Ce fichier fait ${mo} Mo, le maximum est ${Math.round(
+        MAX_FICHIER_OCTETS / (1024 * 1024)
+      )} Mo. Compresse-le avant de l'envoyer.`;
+      return;
+    }
+
     submitBtn.disabled = true;
-    messageEl.textContent = "Envoi en cours…";
 
-    const estVideo =
-      fichier.type.startsWith("video") || /\.(mov|mp4|m4v|webm|mkv|avi|3gp)$/i.test(fichier.name);
-    const type = estVideo ? "video" : "image";
-    const nomPropre = fichier.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const cheminBlob = `nouvelles/${dossierMeta.id}/${Date.now()}-${nomPropre}`;
-
-    let blob;
+    // Étape 1 : demander au serveur une URL d'envoi signée pour Cloudflare R2.
+    let signature;
     try {
-      // Chargé dynamiquement (fonctionne dans un <script> classique,
-      // pas besoin de convertir toute la page en modules).
-      const { upload } = await import("https://esm.sh/@vercel/blob/client");
-      messageEl.textContent = "Envoi en cours… ça peut prendre plusieurs minutes pour une vidéo, merci de patienter sans fermer la page.";
-      blob = await upload(cheminBlob, fichier, {
-        access: "public",
-        handleUploadUrl: "/api/blob-upload",
-        // Indispensable pour les gros fichiers (vidéos) : découpe l'envoi
-        // en plusieurs parties, les envoie avec des tentatives de reprise
-        // en cas de coupure, au lieu d'une seule requête géante fragile.
-        multipart: true,
-        // Pas de onUploadProgress : sur Safari, ça force @vercel/blob à
-        // envoyer le corps de la requête en ReadableStream, ce que Safari
-        // affirme supporter (faux positif d'un test de détection connu
-        // pour être cassé sur Safari) puis refuse réellement au moment
-        // de l'envoi, avec l'erreur "ReadableStream uploading is not
-        // supported". Sans ce callback, le SDK envoie un Blob classique,
-        // qui fonctionne partout, y compris sur Safari/iPhone.
+      messageEl.textContent = "Préparation de l'envoi…";
+      const reponse = await fetch("/api/r2-upload-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          dossier: dossierMeta.id,
+          nomFichier: fichier.name,
+          contentType,
+          taille: fichier.size,
+        }),
+      });
+      const donnees = await reponse.json().catch(() => ({}));
+      if (!reponse.ok) throw new Error(donnees.erreur || `Erreur ${reponse.status}`);
+      signature = donnees;
+    } catch (erreurSignature) {
+      console.error("URL d'envoi refusée :", erreurSignature);
+      messageEl.textContent = `Envoi impossible : ${erreurSignature.message}`;
+      submitBtn.disabled = false;
+      return;
+    }
+
+    // Étape 2 : envoyer le fichier directement à R2, avec la progression.
+    try {
+      await envoyerVersR2(signature.uploadUrl, fichier, contentType, (pourcentage) => {
+        messageEl.textContent = `Envoi en cours… ${pourcentage} % — ne ferme pas la page.`;
       });
     } catch (erreurEnvoi) {
-      console.error("Échec de l'envoi vers Vercel Blob :", erreurEnvoi);
-
-      // Le SDK @vercel/blob affiche toujours le même message générique
-      // ("Failed to retrieve the client token"), quelle que soit la vraie
-      // cause. On reproduit sa requête nous-mêmes pour lire la vraie
-      // réponse JSON (qui, elle, contient le vrai message).
-      let raison = erreurEnvoi.message || "erreur inconnue";
-      try {
-        const diagnostic = await fetch("/api/blob-upload", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            type: "blob.generate-client-token",
-            payload: {
-              pathname: cheminBlob,
-              callbackUrl: `${window.location.origin}/api/blob-upload`,
-              multipart: false,
-            },
-          }),
-        });
-        const donnees = await diagnostic.json().catch(() => ({}));
-        if (donnees.error) raison = donnees.error;
-      } catch (e) {
-        // Le diagnostic lui-même a échoué : on garde le message d'origine.
-      }
-
-      messageEl.textContent = `Échec de l'envoi : ${raison}`;
+      console.error("Échec de l'envoi vers R2 :", erreurEnvoi);
+      messageEl.textContent = `Échec de l'envoi : ${erreurEnvoi.message}`;
       submitBtn.disabled = false;
       return;
     }
@@ -385,7 +439,7 @@
         body: JSON.stringify({
           dossier: dossierMeta.id,
           dossierNom: dossierMeta.nom,
-          url: blob.url,
+          url: signature.publicUrl,
           type,
           titre,
           description,
