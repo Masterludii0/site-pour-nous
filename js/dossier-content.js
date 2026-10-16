@@ -13,7 +13,7 @@
   "use strict";
 
   // Limites d'envoi (le serveur les vérifie aussi) ---------------
-  const MAX_FICHIER_OCTETS = 500 * 1024 * 1024; // 500 Mo
+  const MAX_FICHIER_OCTETS = 1.2 * 1024 ** 3; // 1,2 Go
 
   const TYPES_PAR_EXTENSION = {
     jpg: "image/jpeg",
@@ -360,9 +360,8 @@
     // Vérification immédiate côté navigateur, pour répondre sans attendre.
     if (fichier.size > MAX_FICHIER_OCTETS) {
       const mo = Math.round(fichier.size / (1024 * 1024));
-      messageEl.textContent = `Ce fichier fait ${mo} Mo, le maximum est ${Math.round(
-        MAX_FICHIER_OCTETS / (1024 * 1024)
-      )} Mo. Compresse-le avant de l'envoyer.`;
+      const maxGo = (MAX_FICHIER_OCTETS / 1024 ** 3).toFixed(1).replace(".", ",");
+      messageEl.textContent = `Ce fichier fait ${mo} Mo, le maximum est ${maxGo} Go. Compresse-le avant de l'envoyer.`;
       return;
     }
 
