@@ -7,8 +7,8 @@
 // ensuite (via /api/medias) — d'où la synchronisation.
 // ============================================================
 
-import { put, head, BlobNotFoundError } from '@vercel/blob';
 import nodemailer from 'nodemailer';
+import { lireManifeste, modifierManifeste } from '../lib/manifeste.js';
 
 const DOSSIERS_AUTORISES = ['moi', 'morgane'];
 
@@ -25,9 +25,7 @@ async function envoyerNotifications({ dossierNom, titre, lienDossier, exclure })
 
   let abonnes = [];
   try {
-    const manifestBlob = await head('manifests/abonnes.json');
-    const reponse = await fetch(manifestBlob.url);
-    abonnes = await reponse.json();
+    abonnes = (await lireManifeste('manifests/abonnes.json')).donnees;
   } catch (e) {
     abonnes = [];
   }
@@ -83,22 +81,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ erreur: 'Adresse de média non reconnue.' });
     }
 
-    const manifestPath = `manifests/${dossier}.json`;
-
-    let medias = [];
-    try {
-      const manifestBlob = await head(manifestPath);
-      const reponse = await fetch(manifestBlob.url);
-      medias = await reponse.json();
-    } catch (e) {
-      if (!(e instanceof BlobNotFoundError)) {
-        // Une vraie erreur (pas juste "pas encore de manifeste") : on la
-        // remonte au lieu de la masquer silencieusement.
-        throw e;
-      }
-      medias = [];
-    }
-
     const nouveauMedia = {
       url: urlTexte,
       type: type === 'video' ? 'video' : 'image',
@@ -107,13 +89,9 @@ export default async function handler(req, res) {
       date: new Date().toISOString(),
     };
 
-    medias.push(nouveauMedia);
-
-    await put(manifestPath, JSON.stringify(medias), {
-      access: 'public',
-      contentType: 'application/json',
-      addRandomSuffix: false,
-      allowOverwrite: true,
+    await modifierManifeste(`manifests/${dossier}.json`, (medias) => {
+      medias.push(nouveauMedia);
+      return { donnees: medias };
     });
 
     try {
