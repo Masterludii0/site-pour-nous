@@ -5,7 +5,7 @@
 // les autres manifestes du site.
 // ============================================================
 
-import { put, head, BlobNotFoundError } from '@vercel/blob';
+import { modifierManifeste } from '../lib/manifeste.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -26,27 +26,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ erreur: 'Adresse email invalide.' });
     }
 
-    const manifestPath = 'manifests/abonnes.json';
-
-    let abonnes = [];
-    try {
-      const manifestBlob = await head(manifestPath);
-      const reponse = await fetch(manifestBlob.url);
-      abonnes = await reponse.json();
-    } catch (e) {
-      if (!(e instanceof BlobNotFoundError)) throw e;
-      abonnes = [];
-    }
-
-    if (!abonnes.includes(email)) {
+    await modifierManifeste('manifests/abonnes.json', (abonnes) => {
+      // Déjà inscrit : rien à écrire.
+      if (abonnes.includes(email)) return {};
       abonnes.push(email);
-      await put(manifestPath, JSON.stringify(abonnes), {
-        access: 'public',
-        contentType: 'application/json',
-        addRandomSuffix: false,
-        allowOverwrite: true,
-      });
-    }
+      return { donnees: abonnes };
+    });
 
     return res.status(200).json({ succes: true });
   } catch (erreur) {
