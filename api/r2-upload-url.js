@@ -33,7 +33,7 @@ const TYPES_AUTORISES = [
   'video/webm',
 ];
 
-const MAX_FICHIER_OCTETS = 500 * 1024 * 1024; // 500 Mo
+const MAX_FICHIER_OCTETS = 1.2 * 1024 ** 3; // 1,2 Go par fichier
 const VARIABLES_REQUISES = [
   'R2_ACCOUNT_ID',
   'R2_ACCESS_KEY_ID',
@@ -124,9 +124,9 @@ export default async function handler(req, res) {
     }
     if (octets > MAX_FICHIER_OCTETS) {
       return res.status(400).json({
-        erreur: `Fichier trop lourd (${enMo(octets)} Mo). Maximum : ${enMo(
+        erreur: `Fichier trop lourd (${enMo(octets)} Mo). Maximum : ${enGo(
           MAX_FICHIER_OCTETS
-        )} Mo — compresse la vidéo avant de l'envoyer.`,
+        )} Go — compresse la vidéo avant de l'envoyer.`,
       });
     }
 
