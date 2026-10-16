@@ -150,7 +150,6 @@
   const videoEl = lightbox.querySelector(".lightbox__video");
   const lbTitleEl = lightbox.querySelector("[data-lightbox-title]");
   const lbDescEl = lightbox.querySelector("[data-lightbox-description]");
-  const deleteBtn = lightbox.querySelector("[data-lightbox-delete]");
   const closeBtn = lightbox.querySelector(".lightbox__close");
   const likeBtn = lightbox.querySelector("[data-lightbox-like]");
   const likeIconEl = likeBtn.querySelector(".lightbox__like-icon");
@@ -222,8 +221,6 @@
     lbTitleEl.textContent = media.titre || "";
     lbDescEl.textContent = media.description || "";
     lbDescEl.hidden = !media.description;
-    deleteBtn.disabled = false;
-    deleteBtn.textContent = "Supprimer ce souvenir";
     renderLike(media);
     renderComments(media);
     commentForm.reset();
@@ -309,36 +306,6 @@
       window.alert("Le commentaire n'a pas pu être envoyé. Réessaie dans un instant.");
     } finally {
       boutonEnvoyer.disabled = false;
-    }
-  });
-
-  deleteBtn.addEventListener("click", async () => {
-    if (!mediaOuvert) return;
-    const confirmation = window.confirm("Supprimer ce souvenir ? C'est définitif.");
-    if (!confirmation) return;
-
-    deleteBtn.disabled = true;
-    deleteBtn.textContent = "Suppression…";
-
-    try {
-      const reponse = await fetch("/api/supprimer-media", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ dossier: dossierMeta.id, url: mediaOuvert.url }),
-      });
-
-      if (!reponse.ok) {
-        const donnees = await reponse.json().catch(() => ({}));
-        throw new Error(donnees.erreur || `Erreur ${reponse.status}`);
-      }
-
-      closeLightbox();
-      await chargerMedias();
-    } catch (erreur) {
-      console.error(erreur);
-      window.alert(`La suppression a échoué : ${erreur.message}`);
-      deleteBtn.disabled = false;
-      deleteBtn.textContent = "Supprimer ce souvenir";
     }
   });
 
