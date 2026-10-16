@@ -6,7 +6,7 @@
 // un ajout fait par une personne apparaît pour tout le monde.
 // ============================================================
 
-import { head, BlobNotFoundError } from '@vercel/blob';
+import { lireManifeste } from '../lib/manifeste.js';
 
 const DOSSIERS_AUTORISES = ['moi', 'morgane'];
 
@@ -25,16 +25,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    const manifestPath = `manifests/${dossier}.json`;
-    const manifestBlob = await head(manifestPath);
-    const reponse = await fetch(manifestBlob.url);
-    const medias = await reponse.json();
-    return res.status(200).json({ medias });
+    // Pas de cache : on veut toujours la version la plus récente.
+    res.setHeader('Cache-Control', 'no-store');
+    const { donnees } = await lireManifeste(`manifests/${dossier}.json`);
+    return res.status(200).json({ medias: donnees });
   } catch (e) {
-    if (e instanceof BlobNotFoundError) {
-      // Pas encore de manifeste = dossier vide pour l'instant, pas une erreur.
-      return res.status(200).json({ medias: [] });
-    }
     console.error(e);
     return res.status(500).json({ erreur: e.message || 'Erreur inconnue' });
   }
