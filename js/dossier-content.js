@@ -23,13 +23,18 @@
     gif: "image/gif",
     mp4: "video/mp4",
     m4v: "video/mp4",
-    mov: "video/quicktime",
+    // Un .mov est enregistré comme "video/mp4" : le contenu d'un .mov
+    // (iPhone) et d'un .mp4 est le même format. Servi comme
+    // "video/quicktime", Chrome/Edge refusent de le lire dans la page et
+    // le téléchargent à la place.
+    mov: "video/mp4",
     webm: "video/webm",
   };
 
   // Certains navigateurs laissent le type du fichier vide (typique pour
   // les .mov) : on le déduit alors de l'extension.
   function devinerContentType(fichier) {
+    if (fichier.type === "video/quicktime") return "video/mp4";
     if (fichier.type) return fichier.type;
     const extension = (fichier.name.split(".").pop() || "").toLowerCase();
     return TYPES_PAR_EXTENSION[extension] || "";
