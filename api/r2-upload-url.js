@@ -94,6 +94,16 @@ export default async function handler(req, res) {
     });
   }
 
+  // Erreur classique : coller l'adresse de l'API S3 (…r2.cloudflarestorage.com)
+  // au lieu de l'adresse publique (https://pub-….r2.dev). L'API S3 exige une
+  // authentification : les médias s'enverraient mais ne s'afficheraient jamais.
+  if (/cloudflarestorage\.com/i.test(urlPublique())) {
+    return res.status(500).json({
+      erreur:
+        "R2_PUBLIC_URL est mal réglée : elle contient l'adresse de l'API (…r2.cloudflarestorage.com). Mets l'adresse publique du bucket (Settings → Public Development URL, du type https://pub-xxxx.r2.dev), puis redéploie.",
+    });
+  }
+
   try {
     const { dossier, nomFichier, contentType, taille } = req.body || {};
 
