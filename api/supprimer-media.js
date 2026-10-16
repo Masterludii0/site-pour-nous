@@ -7,8 +7,9 @@
 // la suppression dès le prochain chargement (même manifeste partagé).
 // ============================================================
 
-import { put, head, del, BlobNotFoundError } from '@vercel/blob';
+import { del } from '@vercel/blob';
 import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { modifierManifeste, ErreurHttp } from '../lib/manifeste.js';
 
 const DOSSIERS_AUTORISES = ['moi', 'morgane'];
 
@@ -53,29 +54,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ erreur: 'URL manquante' });
     }
 
-    const manifestPath = `manifests/${dossier}.json`;
-
-    let medias = [];
-    try {
-      const manifestBlob = await head(manifestPath);
-      const reponse = await fetch(manifestBlob.url);
-      medias = await reponse.json();
-    } catch (e) {
-      if (!(e instanceof BlobNotFoundError)) throw e;
-      medias = [];
-    }
-
-    const mediasRestants = medias.filter((m) => m.url !== url);
-
-    if (mediasRestants.length === medias.length) {
-      return res.status(404).json({ erreur: 'Ce média est introuvable dans ce dossier.' });
-    }
-
-    await put(manifestPath, JSON.stringify(mediasRestants), {
-      access: 'public',
-      contentType: 'application/json',
-      addRandomSuffix: false,
-      allowOverwrite: true,
+    await modifierManifeste(`manifests/${dossier}.json`, (medias) => {
+      const mediasRestants = medias.filter((m) => m.url !== url);
+      if (mediasRestants.length === medias.length) {
+        throw new ErreurHttp(404, 'Ce média est introuvable dans ce dossier.');
+      }
+      return { donnees: mediasRestants };
     });
 
     // On supprime aussi le fichier lui-même. Si ça échoue, ce n'est pas
@@ -94,6 +78,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ succes: true });
   } catch (erreur) {
+    if (erreur instanceof ErreurHttp) return res.status(erreur.statut).json({ erreur: erreur.message });
     console.error(erreur);
     return res.status(500).json({ erreur: erreur.message || 'Suppression impossible.' });
   }
